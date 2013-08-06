@@ -68,6 +68,16 @@ public class Board {
 		
 	}
 	
+	private static class Move{
+		public Point myStart;
+		public Point myEnd;
+		
+		public Move(Point start, Point end){
+			myStart = start;
+			myEnd = end;
+		}
+	}
+	
 	public boolean canMove(Block myBlock, Point goal){
 		ArrayList<Point> x = new ArrayList<Point>();
 		for (short i = 0; i < board.length; i++) {
