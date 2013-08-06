@@ -78,15 +78,43 @@ public class Board {
 		}
 	}
 	
-	public boolean canMove(Block myBlock, Point goal){
-		ArrayList<Point> x = new ArrayList<Point>();
-		for (short i = 0; i < board.length; i++) {
-			for (short k = 0; k < board[0].length; k++) {
+	public ArrayList<Move> possibleMoves(){
+		//create an array list of empty spaces
+		ArrayList<Moves> possible = new ArrayList<Moves>();
+		ArrayList<Block> emptySpace = new ArrayList<Block>();
+		for (int i = 0; i < board.length; i++) {
+			for (int k = 0; k < board[0].length; k++) {
 				if(board[i][k] == false)
-					x.add(new Point(i,k));
+					emptySpace.add(new Block(i,k,i,k));
 			}
 		}
-		return true;
+		//match blocks to empty spaces
+		
+		//for everyBlock, for every empty space, does the block fit in the space?
+		for (Block s : blocks) {
+			for (int i = 0; i < emptySpace.size(); i++) {
+				//variable = top left match?
+				//variable = bottom right match?
+				
+				//left to right move
+				if(s.getTopLeft().getX() == emptySpace.get(i).getTopLeft().getX()){
+					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				}
+				if(s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()){
+					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				}
+				//if variableTopLeft is below or above or equal to variableBottomRight
+				
+				
+				//top to bottom move
+				if(s.getTopLeft().getY() == emptySpace.get(i).getTopLeft().getY()){
+					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				}
+				if(s.getBottomRight().getY() == emptySpace.get(i).getBottomRight().getY()){
+					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				}
+			}
+		}
 	}
 
 	/*
