@@ -60,12 +60,49 @@ public class Board {
 		blocks.add(myBlock);
 	}
 	
-	public void moveBlockVertical(Block myBlock, short margin ){
 	
+	/*
+	 * precondition: This block can move to intended destination
+	 * negative margin means move up 
+	 * positive margin means move down
+	 */
+	public void moveBlockVertical(Block myBlock, short margin ){
+		short newXTL = (short) (myBlock.getTopLeft().getX() + margin);
+		short newXBR = (short) (myBlock.getBottomRight().getX() + margin);
+		short newYTL = (short) (myBlock.getTopLeft().getY());
+		short newYBR = (short) (myBlock.getBottomRight().getY());
+		for (short i = (short) myBlock.getTopLeft().getX();  
+				i <= myBlock.getBottomRight().getX(); i++) {
+			for (short a = (short) myBlock.getTopLeft().getY(); 
+					a <= myBlock.getBottomRight().getY(); a++) {
+				System.out.println("i: " + i + " a: " + a);
+				
+				board[i][a] = false;
+			}
+		}
+		
+		for (short i = newXTL; i <= newXBR  ; i++) {
+			
+			for (short a = newYTL; a <= newYBR; a++) {
+				board[i][a] = true;
+			}
+		}
+		myBlock.move(0, margin);
 	}
 	
 	public void moveBlockHorizontal(Block myBlock, short margin){
 		
+	}
+	
+	public Board copyBoard(){
+		Board copy = new Board((short) board.length, (short) board[0].length);
+		for (short i = 0; i < board.length; i++) {
+			for (short k = 0; k < board[0].length; k++) {
+				copy.board[i][k] = this.board[i][k];
+			}
+		}
+		copy.blocks = new HashSet(this.blocks);
+		return copy;
 	}
 	
 	private static class Move{
