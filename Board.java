@@ -238,7 +238,6 @@ public class Board {
 	public int hashCode(){
 		return blocks.hashCode();
 	}
-	
 	/*
 	 * So that contains will work for a HashSet of Blocks.
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -248,17 +247,12 @@ public class Board {
 		if (other == this) return true;
 		if (!(other instanceof Board))return false;
 		
+		
 		Board otherBoard = (Board) other;
-		if (this.blocks.size() != otherBoard.blocks.size()){
-			return false;
-		}
-		for (Block b: this.blocks){
-			if (!otherBoard.blocks.contains(b)){
-				return false;
-			}
-		}
-		return true;
+		return this.blocks.equals(otherBoard.blocks);
+	
 	}
+	
 	
 	/*
 	 * Still needs to be implemented
