@@ -60,20 +60,14 @@ public class Board {
 		blocks.add(myBlock);
 	}
 	
-	
-	/*
-	 * precondition: This block can move to intended destination
-	 * negative margin means move up 
-	 * positive margin means move down
-	 */
-	public void moveBlockVertical(Block myBlock, short margin ){
-		short newXTL = (short) (myBlock.getTopLeft().getX() + margin);
-		short newXBR = (short) (myBlock.getBottomRight().getX() + margin);
-		short newYTL = (short) (myBlock.getTopLeft().getY());
-		short newYBR = (short) (myBlock.getBottomRight().getY());
-		for (short i = (short) myBlock.getTopLeft().getX();  
+	public void moveBlockVertical(Block myBlock, int margin ){
+		int newXTL = (int) (myBlock.getTopLeft().getX() + margin);
+		int newXBR = (int) (myBlock.getBottomRight().getX() + margin);
+		int newYTL = (int) (myBlock.getTopLeft().getY());
+		int newYBR = (int) (myBlock.getBottomRight().getY());
+		for (int i = (int) myBlock.getTopLeft().getX();  
 				i <= myBlock.getBottomRight().getX(); i++) {
-			for (short a = (short) myBlock.getTopLeft().getY(); 
+			for (int a = (int) myBlock.getTopLeft().getY(); 
 					a <= myBlock.getBottomRight().getY(); a++) {
 				System.out.println("i: " + i + " a: " + a);
 				
@@ -81,23 +75,50 @@ public class Board {
 			}
 		}
 		
-		for (short i = newXTL; i <= newXBR  ; i++) {
+		for (int i = newXTL; i <= newXBR  ; i++) {
 			
-			for (short a = newYTL; a <= newYBR; a++) {
+			for (int a = newYTL; a <= newYBR; a++) {
 				board[i][a] = true;
 			}
 		}
 		myBlock.move(0, margin);
 	}
-	
-	public void moveBlockHorizontal(Block myBlock, short margin){
+	/*
+	 * precondition: This block can move to intended destination
+	 * negative margin means move right 
+	 * positive margin means move left
+	 */
+	public void moveBlockHorizontal(Block myBlock, int margin){
+		System.out.println(myBlock.getTopLeft().getY());
+		int newXTL = (int) (myBlock.getTopLeft().getX());
+		int newXBR = (int) (myBlock.getBottomRight().getX());
+		int newYTL = (int) (myBlock.getTopLeft().getY()+ margin);
+		int newYBR = (int) (myBlock.getBottomRight().getY() + margin);
+		for (int i = (int) myBlock.getTopLeft().getX();  
+				i <= myBlock.getBottomRight().getX(); i++) {
+			for (int a = (int) myBlock.getTopLeft().getY(); 
+					a <= myBlock.getBottomRight().getY(); a++) {
+				System.out.println(myBlock.getTopLeft().getY());
+				System.out.println("i: " + i + " a: " + a);
+				
+				board[i][a] = false;
+			}
+		}
 		
+		for (int i = newXTL; i <= newXBR  ; i++) {
+			
+			for (int a = newYTL; a <= newYBR; a++) {
+				board[i][a] = true;
+			}
+		}
+		myBlock.move(margin, 0);
 	}
-	
+
+
 	public Board copyBoard(){
-		Board copy = new Board((short) board.length, (short) board[0].length);
-		for (short i = 0; i < board.length; i++) {
-			for (short k = 0; k < board[0].length; k++) {
+		Board copy = new Board((int) board.length, (int) board[0].length);
+		for (int i = 0; i < board.length; i++) {
+			for (int k = 0; k < board[0].length; k++) {
 				copy.board[i][k] = this.board[i][k];
 			}
 		}
@@ -105,15 +126,26 @@ public class Board {
 		return copy;
 	}
 	
-	private static class Move{
-		public Point myStart;
-		public Point myEnd;
-		
-		public Move(Point start, Point end){
-			myStart = start;
-			myEnd = end;
+	public Block getBlock(Point topLeft, Point bottomRight){
+		Block myBlock = new Block(0,0,0,0);
+		for (Block b: this.blocks){
+			if (b.getTopLeft().equals(topLeft) 
+					&& b.getBottomRight().equals( bottomRight)){
+				myBlock = b;
+			}
+		}
+		return myBlock;
+	}
+	
+	public void removeBlock(Block myBlock){
+		this.blocks.remove(myBlock);
+		for (int i = (int) myBlock.getTopLeft().getX(); i<= myBlock.getBottomRight().getX(); i++){
+			for (int k = (int) myBlock.getTopLeft().getY(); k <= myBlock.getBottomRight().getY(); k++ ){
+				board[i][k] = false;
+			}
 		}
 	}
+	
 	
 	public ArrayList<Move> possibleMoves(){
 		//create an array list of empty spaces
@@ -172,6 +204,21 @@ public class Board {
 	public static void main (String [ ] args) throws IllegalBoardException {
 		Board test = new Board(args);
 		test.printboard();
+		Block myBlock = test.getBlock(new Point(1,1), new Point(2,2));
+		System.out.println(myBlock.getTopLeft());
+		System.out.println(myBlock.getBottomRight());
+		System.out.println("before move vertical " +myBlock.getTopLeft().getY());
+		test.moveBlockVertical(myBlock, -1);
+		System.out.println("after move vertical " +myBlock.getTopLeft().getY());
+		test.printboard();
+		
+		test.removeBlock(test.getBlock(new Point(0,0), new Point(1,0)));
+		
+		System.out.println("before method " +myBlock.getTopLeft().getY());
+		test.moveBlockHorizontal(myBlock, -1);
+		test.printboard();
+		
+		
 	}
 }
 
