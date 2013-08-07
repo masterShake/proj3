@@ -30,6 +30,14 @@ public class Block {
 		bottomRight.move(bottomRight.x + vertical, bottomRight.x + horizontal);
 	}
 	
+		/*
+	 * Could be improved
+	 * 
+	 */
+	public int hashCode(){
+		return getTopLeft().x + getTopLeft().y + getBottomRight().x + getBottomRight().y;
+	}
+	
 	
 	//to be implemented later if needed
 	public Point getTopRight(){
