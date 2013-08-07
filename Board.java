@@ -229,6 +229,37 @@ public class Board {
 		
 	}
 
+
+	/*
+	 * Could be improved to make board's hash faster
+	 * so program will be more efficient
+	 * Used in solvers Visited HashSet.
+	 */
+	public int hashCode(){
+		return blocks.hashCode();
+	}
+	
+	/*
+	 * So that contains will work for a HashSet of Blocks.
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object other){
+		if (other == null) return false;
+		if (other == this) return true;
+		if (!(other instanceof Board))return false;
+		
+		Board otherBoard = (Board) other;
+		if (this.blocks.size() != otherBoard.blocks.size()){
+			return false;
+		}
+		for (Block b: this.blocks){
+			if (!otherBoard.blocks.contains(b)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/*
 	 * Still needs to be implemented
 	 */
