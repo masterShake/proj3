@@ -8,6 +8,12 @@ public class Board {
 	private boolean[][] board;
 	private HashSet<Block> blocks;
 	
+	
+	public Board(int length, int width){
+		board = new boolean[length][width];
+		blocks = new HashSet<Block>();
+	}
+	
 	/* We will probably make multiple constructors, but this one will 
 	 * create a board by taking in an input file.
 	 */
