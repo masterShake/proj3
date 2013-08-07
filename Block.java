@@ -48,4 +48,14 @@ public class Block {
 	public Point getBottomLeft(){
 		return new Point();
 	}
+	
+	public boolean equals(Object other){
+		if (other == null) return false;
+		if (other == this) return true;
+		if (!(other instanceof Block))return false;
+		
+		Block otherBlock = (Block) other;
+		return this.topLeft.equals(otherBlock.topLeft) 
+				&& this.bottomRight.equals(otherBlock.bottomRight);
+	}
 }
