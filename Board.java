@@ -146,44 +146,81 @@ public class Board {
 		}
 	}
 	
-	
-	public ArrayList<Move> possibleMoves(){
-		//create an array list of empty spaces
-		ArrayList<Moves> possible = new ArrayList<Moves>();
-		ArrayList<Block> emptySpace = new ArrayList<Block>();
-		for (int i = 0; i < board.length; i++) {
-			for (int k = 0; k < board[0].length; k++) {
-				if(board[i][k] == false)
-					emptySpace.add(new Block(i,k,i,k));
-			}
+	//the new Move class returns and block and a string
+	private static class Move{
+		public Block myBlock;
+		public String oneDirection;
+
+		public Move(Block b, String d){
+			myBlock = b;
+			oneDirection = d;
 		}
-		//match blocks to empty spaces
+	}
+
+    	public ArrayList<Move> possibleMoves(){
+    	
+    		//initialize the ArrayList of Moves
+	    	ArrayList<Move> m = new ArrayList<Move>();
 		
-		//for everyBlock, for every empty space, does the block fit in the space?
+		//match blocks to empty spaces
 		for (Block s : blocks) {
-			for (int i = 0; i < emptySpace.size(); i++) {
-				//variable = top left match?
-				//variable = bottom right match?
-				
-				//left to right move
-				if(s.getTopLeft().getX() == emptySpace.get(i).getTopLeft().getX()){
-					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+			
+			int R = 0;
+			int L = 0;
+			int U = 0;
+			int D = 0;
+			//see if current block can go left or right
+			for (int i = (int) s.getTopLeft().getX(); i<= (int)s.bottomRight.getX();i++){
+				//left
+				if((int)s.topLeft.y==0){
+					L+=1;
 				}
-				if(s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()){
-					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				try{
+				if(board[i][(int) (s.getTopLeft().getY()-1)]==true){
+					L+=1;
 				}
-				//if variableTopLeft is below or above or equal to variableBottomRight
-				
-				
-				//top to bottom move
-				if(s.getTopLeft().getY() == emptySpace.get(i).getTopLeft().getY()){
-					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
+				}catch(Exception e){}
+				//right
+				if((int)s.bottomRight.y == board[0].length-1)
+					R++;
+				try{
+				if(board[i][(int) (s.getBottomRight().getY()+1)]==true){
+					R+=1;
 				}
-				if(s.getBottomRight().getY() == emptySpace.get(i).getBottomRight().getY()){
-					//&& s.getBottomRight().getX() == emptySpace.get(i).getBottomRight().getX()
-				}
+				}catch(Exception e){}
+			//see if the block can go up or down
 			}
+			for (int k = (int) s.getTopLeft().getY(); k<= (int)s.getBottomRight().getY();k++){
+				//up
+				if(s.getTopLeft().getX()==0){
+					U++;
+				}
+				try{
+				if(board[(int) (s.getTopLeft().getX()-1)][k]==true || (int)s.getTopLeft().getX()==0){
+					U+=1;
+				}
+				}catch(Exception e){}
+				//down
+				if(s.getBottomRight().getX()== board.length-1)
+					D++;
+				
+				try{
+				if(board[(int) (s.getBottomRight().getX()+1)][k]==true || (int)s.getBottomRight().getX()==board[0].length){
+					D+=1;
+				}
+				}catch(Exception e){}
+			}
+			if(L==0)
+				m.add(new Move(s, "left"));
+			if(R==0)
+				m.add(new Move(s, "right"));
+			if(U==0)
+				m.add(new Move(s, "up"));
+			if(D==0)
+				m.add(new Move(s, "down"));	
 		}
+		return m;
+		
 	}
 
 	/*
