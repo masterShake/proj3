@@ -26,9 +26,10 @@ public class Block {
 	up or right.
 	*/
 	public void move(int horizontal, int vertical){
-		topLeft.move(horizontal, vertical);
-		bottomRight.move(horizontal, vertical);
+		topLeft.move(topLeft.x + vertical, topLeft.y + horizontal);
+		bottomRight.move(bottomRight.x + vertical, bottomRight.x + horizontal);
 	}
+	
 	
 	//to be implemented later if needed
 	public Point getTopRight(){
