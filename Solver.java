@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 
@@ -13,6 +12,34 @@ public class Solver {
 		boardStack = new Stack();
 		boardStack.push(new Board(args));
 		visited.add(boardStack.firstElement());
+	}
+	
+	//populates the List with blocks from the final configuration file.
+	public void getFinalConfig(String [] args) throws IllegalBoardException{
+			int argIndex;
+			if (args.length == 2){
+				argIndex = 1;
+			} else if (args.length > 3 || args.length < 1){
+				throw new IllegalBoardException("Incorrect number of input files: " + args.length);
+			}
+			else {
+				argIndex = 2;
+			}
+			InputSource initBoard = new InputSource(args[argIndex]);
+			//blocks = new HashSet();
+			while (true) {
+				String input = initBoard.readLine();
+				if (input == null) {
+	                return;
+	            }
+		
+				StringTokenizer st = new StringTokenizer(input);
+					finalConfig.add(new Block((short)Integer.parseInt(st.nextToken()),
+											(short)Integer.parseInt(st.nextToken()),
+											(short)Integer.parseInt(st.nextToken()),
+											(short)Integer.parseInt(st.nextToken())));
+				
+	        }
 	}
 	
 	//we need to write some sort of algorithm method
@@ -38,6 +65,16 @@ public class Solver {
 			}
 		}
 		
+	}
+	
+	public boolean isGoal(Board B){
+		int misses = 0;
+		for(int i = 0; i < finalConfig.size(); i++){
+			if(!B.blocks.contains(finalConfig.get(i))){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public static void main (String [] args) throws IllegalBoardException{
