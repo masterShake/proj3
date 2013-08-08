@@ -178,12 +178,11 @@ public class Board {
 			//see if current block can go left or right
 			for (int i = (int) s.getTopLeft().getX(); i<= (int)s.bottomRight.getX();i++){
 				//left
-				if((int)s.topLeft.y==0){
-					L+=1;
-				}
+				if((int)s.topLeft.y==0)
+					L++;
 				try{
 				if(board[i][(int) (s.getTopLeft().getY()-1)]==true){
-					L+=1;
+					L++;
 				}
 				}catch(Exception e){}
 				//right
@@ -191,28 +190,26 @@ public class Board {
 					R++;
 				try{
 				if(board[i][(int) (s.getBottomRight().getY()+1)]==true){
-					R+=1;
+					R++;
 				}
 				}catch(Exception e){}
 			//see if the block can go up or down
 			}
 			for (int k = (int) s.getTopLeft().getY(); k<= (int)s.getBottomRight().getY();k++){
 				//up
-				if(s.getTopLeft().getX()==0){
+				if(s.getTopLeft().getX()==0)
 					U++;
-				}
 				try{
 				if(board[(int) (s.getTopLeft().getX()-1)][k]==true || (int)s.getTopLeft().getX()==0){
-					U+=1;
+					U++;
 				}
 				}catch(Exception e){}
 				//down
 				if(s.getBottomRight().getX()== board.length-1)
 					D++;
-				
 				try{
 				if(board[(int) (s.getBottomRight().getX()+1)][k]==true || (int)s.getBottomRight().getX()==board[0].length){
-					D+=1;
+					D++;
 				}
 				}catch(Exception e){}
 			}
