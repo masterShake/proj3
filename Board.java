@@ -6,7 +6,9 @@ import java.awt.*;
 public class Board {
 
 	private boolean[][] board;
-	private HashSet<Block> blocks;
+	public HashSet<Block> blocks;
+	private Board parent;
+	private String move;
 	
 	
 	public Board(int length, int width){
@@ -151,17 +153,6 @@ public class Board {
 			}
 		}
 	}
-	
-	//the new Move class returns and block and a string
-	private static class Move{
-		public Block myBlock;
-		public String oneDirection;
-
-		public Move(Block b, String d){
-			myBlock = b;
-			oneDirection = d;
-		}
-	}
 
     	public ArrayList<Move> possibleMoves(){
     	
@@ -176,9 +167,9 @@ public class Board {
 			int U = 0;
 			int D = 0;
 			//see if current block can go left or right
-			for (int i = (int) s.getTopLeft().getX(); i<= (int)s.bottomRight.getX();i++){
+			for (int i = (int) s.getTopLeft().getX(); i<= (int)s.getBottomRight().getX();i++){
 				//left
-				if((int)s.topLeft.y==0)
+				if((int)s.getTopLeft().getY()==0)
 					L++;
 				try{
 				if(board[i][(int) (s.getTopLeft().getY()-1)]==true){
@@ -186,7 +177,7 @@ public class Board {
 				}
 				}catch(Exception e){}
 				//right
-				if((int)s.bottomRight.y == board[0].length-1)
+				if((int)s.getBottomRight().getY() == board[0].length-1)
 					R++;
 				try{
 				if(board[i][(int) (s.getBottomRight().getY()+1)]==true){
@@ -250,6 +241,60 @@ public class Board {
 	
 	}
 	
+	/*
+	 * isOK for Board
+	 * ask sergio if boolean board has to match up with board
+	 */
+	public boolean isOK() {
+		boolean[][] existing = new boolean[board.length][board[0].length];
+		for (Block current: blocks) {
+			short xcoordTL = (short) current.getTopLeft().x;
+			short ycoordTL = (short) current.getTopLeft().y;
+			short xcoordBR = (short) current.getBottomRight().x;
+			short ycoordBR = (short) current.getBottomRight().y;
+			if (xcoordTL < 0 || ycoordTL < 0 || xcoordBR < 0 || ycoordBR < 0) {
+				return false;
+			}
+			if (xcoordTL > board.length || ycoordTL > board[0].length || xcoordBR > board.length || ycoordBR > board[0].length){
+				return false;
+			}
+			for (short i = xcoordTL; i <= xcoordBR; i++) {
+				for (short a = ycoordTL; a <= ycoordBR; a++) {
+					if (!existing[i][a]) {
+						existing[i][a] = true;
+					} else {
+						return false;
+					}
+				}
+			}
+		}
+		if (!java.util.Arrays.equals(existing, board)) {
+			return false;
+		}
+		return true;
+	}
+	
+	/*
+	 * Get method for parent board
+	 */
+	public Board getParent() {
+		return parent;
+	}
+	
+	public void setParent(Board parent) {
+		this.parent = parent;
+	}
+	
+	/*
+	 * Get method for the previous move that gets you to current board
+	 */
+	public String getMove() {
+		return move;
+	}
+	
+	public void setMove(String move) {
+		this.move = move;
+	}
 	
 	/*
 	 * Still needs to be implemented
@@ -276,9 +321,7 @@ public class Board {
 		test.moveBlockVertical(myBlock, -1);
 		System.out.println("after move vertical " +myBlock.getTopLeft().getY());
 		test.printboard();
-		
 		test.removeBlock(test.getBlock(new Point(0,0), new Point(1,0)));
-		
 		System.out.println("before method " +myBlock.getTopLeft().getY());
 		test.moveBlockHorizontal(myBlock, -1);
 		test.printboard();
