@@ -58,4 +58,11 @@ public class Block {
 		return this.topLeft.equals(otherBlock.topLeft) 
 				&& this.bottomRight.equals(otherBlock.bottomRight);
 	}
+	
+	//isOK this probably isn't enough code but I'm not really sure what else could be added
+	public boolean isOk(Block B){
+		if(B.getBottomRight().x<B.getTopLeft().x || B.getBottomRight().y<B.getTopLeft().y)
+			return false;
+		return true;
+	}
 }
