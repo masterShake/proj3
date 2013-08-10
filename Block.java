@@ -18,14 +18,9 @@ public class Block {
 		return bottomRight;
 	}
 	
-	/* moves block's point objects but doesn't affect game board. This must be
-	implemented within gameboard.
-	Negative int values for moving left or down. Positve values for moving 
-	up or right.
-	*/
-	public void move(int horizontal, int vertical){
-		topLeft.move(topLeft.x + vertical, topLeft.y + horizontal);
-		bottomRight.move(bottomRight.x + vertical, bottomRight.y + horizontal);
+	public Block copyBlock(){
+		return new Block( this.getTopLeft().x, this.getTopLeft().y,
+				this.getBottomRight().x, this.getBottomRight().y);
 	}
 	
 		/*
