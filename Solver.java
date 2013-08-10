@@ -16,9 +16,11 @@ public class Solver {
 	// we need to write some sort of algorithm method
 	public void searchMethod() throws Exception {
 		if (boardStack.isEmpty()) {
+			System.out.println("empty stack");
 			System.exit(1);
 		}
 		Board current = boardStack.pop();
+		current.printboard();
 		if (this.isGoal(current)) {
 			Board currentCopy = current;
 			String output = "";
@@ -26,11 +28,17 @@ public class Solver {
 				output = currentCopy.getMove() + "\n" + output;
 				currentCopy = currentCopy.getParent();
 			}
-			System.out.println(output);
-			System.exit(1);
+			if (output.length() == 0){
+				System.out.print(output);
+			} else {
+				System.out.print(output.substring(0,output.length()-1));
+			}
+			return;
 		}
+		System.out.println("looking for moves");
 		ArrayList<Move> moves = current.possibleMoves();
 		for (Move m : moves) {
+			System.out.println(m);
 			Board add = current.copyBoard();
 			if (m.oneDirection.equals("up")) {
 				add.moveBlockVertical(m.myBlock, -1);
@@ -43,13 +51,26 @@ public class Solver {
 			} else {
 				throw new Exception("Moves not correctly formatted");
 			}
+			//add.printboard();
+			
+			//add.isOK();
+
 			if (!visited.contains(add)) {
+				//System.out.println(m);
 				boardStack.push(add);
 				visited.add(add);
 				add.setParent(current);
 				add.setMove(m.toString());
 			}
 		}
+		
+		/* PRINT VISITED
+		System.out.println("visited");
+		for (Board b: visited){
+			System.out.println();
+			b.printboard();
+		}
+		*/
 		searchMethod();
 
 	}
