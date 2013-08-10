@@ -3,13 +3,14 @@ import java.util.*;
 public class Solver {
 	private HashSet<Board> visited;
 	private Stack<Board> boardStack;
-	private ArrayList<Block> finalConfig;
+	private ArrayList<Block> finalConfig = new ArrayList<Block>();
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
 		boardStack = new Stack<Board>();
 		boardStack.push(new Board(args));
 		visited.add(boardStack.firstElement());
+		getFinalConfig();
 	}
 
 	// we need to write some sort of algorithm method
