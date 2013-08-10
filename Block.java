@@ -1,5 +1,3 @@
-package proj3;
-
 import java.awt.Point;
 
 public class Block {
@@ -27,7 +25,7 @@ public class Block {
 	*/
 	public void move(int horizontal, int vertical){
 		topLeft.move(topLeft.x + vertical, topLeft.y + horizontal);
-		bottomRight.move(bottomRight.x + vertical, bottomRight.x + horizontal);
+		bottomRight.move(bottomRight.x + vertical, bottomRight.y + horizontal);
 	}
 	
 		/*
@@ -47,6 +45,10 @@ public class Block {
 	//to be implemented later if needed
 	public Point getBottomLeft(){
 		return new Point();
+	}
+	
+	public String toString(){
+		return "TL: " + topLeft + ", BR: " + bottomRight;
 	}
 	
 	public boolean equals(Object other){
