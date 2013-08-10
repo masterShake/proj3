@@ -6,14 +6,14 @@ import java.awt.*;
 public class Board {
 
 	private boolean[][] board;
-	public ArrayList<Block> blocks;
+	public HashSet<Block> blocks;
 	private Board parent;
 	private String move;
 	
 	
 	public Board(int length, int width){
 		board = new boolean[length][width];
-		blocks = new ArrayList<Block>();
+		blocks = new HashSet<Block>();
 	}
 	
 	/* We will probably make multiple constructors, but this one will 
@@ -30,7 +30,7 @@ public class Board {
 			argIndex = 1;
 		}
 		InputSource initBoard = new InputSource(args[argIndex]);
-		blocks = new ArrayList();
+		blocks = new HashSet();
 		while (true) {
 			String input = initBoard.readLine();
 			if (input == null) {
@@ -66,6 +66,10 @@ public class Board {
 		blocks.add(myBlock);
 	}
 	
+	/*
+	 * UPDATE: This method only alters the boolean array.  
+	 * Blocks are now immutable, so boards are immutable as well basically. 
+	 */
 	public void moveBlockVertical(Block myBlock, int margin ){
 		int newXTL = (int) (myBlock.getTopLeft().getX() + margin);
 		int newXBR = (int) (myBlock.getBottomRight().getX() + margin);
@@ -87,12 +91,13 @@ public class Board {
 				board[i][a] = true;
 			}
 		}
-		myBlock.move(0, margin);
 	}
 	/*
 	 * precondition: This block can move to intended destination
 	 * negative margin means move right 
 	 * positive margin means move left
+	 * UPDATE: This method only alters the boolean array. 
+	 * Blocks are now immutable, so boards are immutable as well basically. 
 	 */
 	public void moveBlockHorizontal(Block myBlock, int margin){
 		//System.out.println("margin: " + margin);
@@ -119,18 +124,40 @@ public class Board {
 				board[i][a] = true;
 			}
 		}
-		myBlock.move(margin, 0);
 	}
 
 
-	public Board copyBoard(){
+	public Board alterBoard(Move m){
 		Board copy = new Board((int) board.length, (int) board[0].length);
 		for (int i = 0; i < board.length; i++) {
 			for (int k = 0; k < board[0].length; k++) {
 				copy.board[i][k] = this.board[i][k];
 			}
 		}
-		copy.blocks = new ArrayList<Block>(this.blocks);
+		for (Block b: blocks){
+			if (b.equals(m.myBlock)){
+				if (m.oneDirection.equals("up")) {
+					copy.blocks.add(new Block(b.getTopLeft().x - 1, b.getTopLeft().y,
+							b.getBottomRight().x - 1, b.getBottomRight().y));
+					copy.moveBlockVertical(b, -1);
+				} else if (m.oneDirection.equals("down")) {
+					copy.blocks.add(new Block(b.getTopLeft().x + 1, b.getTopLeft().y,
+							b.getBottomRight().x + 1, b.getBottomRight().y));
+					copy.moveBlockVertical(b, 1);
+				} else if (m.oneDirection.equals("left")) {
+					copy.blocks.add(new Block(b.getTopLeft().x, b.getTopLeft().y - 1,
+							b.getBottomRight().x, b.getBottomRight().y -1));
+					copy.moveBlockHorizontal(b, -1);
+				} else if (m.oneDirection.equals("right")) {
+					copy.blocks.add(new Block(b.getTopLeft().x, b.getTopLeft().y + 1,
+							b.getBottomRight().x, b.getBottomRight().y + 1));
+					copy.moveBlockHorizontal(b, 1);
+				}
+			} else {
+				copy.blocks.add(b.copyBlock());
+			}
+		}
+		
 		return copy;
 	}
 	
@@ -336,15 +363,10 @@ public class Board {
 		System.out.println("after move vertical " +myBlock.getTopLeft().getY());
 		test.printboard();
 		test.isOK();
-		Board test3 = test.copyBoard();
-		System.out.println(test.equals(test3));
 		test.removeBlock(test.getBlock(new Point(0,0), new Point(1,0)));
 		System.out.println("before method " +myBlock.getTopLeft().getY());
 		test.moveBlockHorizontal(myBlock, -1);
 		test.printboard();
-		
-		Board test2 = test.copyBoard();
-		System.out.println(test.equals(test2));
 		
 
 		
