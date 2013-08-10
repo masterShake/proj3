@@ -2,25 +2,25 @@ import java.util.*;
 
 public class Solver {
 	private HashSet<Board> visited;
-	private Stack<Board> boardStack;
+	private Queue<Board> boardStack;
 	private ArrayList<Block> finalConfig = new ArrayList<Block>();
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
-		boardStack = new Stack<Board>();
-		boardStack.push(new Board(args));
-		visited.add(boardStack.firstElement());
+		boardStack = new LinkedList<Board>();
+		boardStack.offer(new Board(args));
+		visited.add(boardStack.peek());
 		getFinalConfig(args);
 	}
 
 	// we need to write some sort of algorithm method
 	public void searchMethod() throws Exception {
 		if (boardStack.isEmpty()) {
-			System.out.println("empty stack");
+			//System.out.println("empty stack");
 			System.exit(1);
 		}
-		Board current = boardStack.pop();
-		current.printboard();
+		Board current = boardStack.poll();
+		//current.printboard();
 		if (this.isGoal(current)) {
 			Board currentCopy = current;
 			String output = "";
@@ -35,29 +35,18 @@ public class Solver {
 			}
 			return;
 		}
-		System.out.println("looking for moves");
+		//System.out.println("looking for moves");
 		ArrayList<Move> moves = current.possibleMoves();
 		for (Move m : moves) {
-			System.out.println(m);
-			Board add = current.copyBoard();
-			if (m.oneDirection.equals("up")) {
-				add.moveBlockVertical(m.myBlock, -1);
-			} else if (m.oneDirection.equals("down")) {
-				add.moveBlockVertical(m.myBlock, 1);
-			} else if (m.oneDirection.equals("left")) {
-				add.moveBlockHorizontal(m.myBlock, -1);
-			} else if (m.oneDirection.equals("right")) {
-				add.moveBlockHorizontal(m.myBlock, 1);
-			} else {
-				throw new Exception("Moves not correctly formatted");
-			}
+			//System.out.println(m);
+			Board add = current.alterBoard(m);
 			//add.printboard();
 			
 			//add.isOK();
 
 			if (!visited.contains(add)) {
 				//System.out.println(m);
-				boardStack.push(add);
+				boardStack.offer(add);
 				visited.add(add);
 				add.setParent(current);
 				add.setMove(m.toString());
