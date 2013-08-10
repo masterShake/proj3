@@ -6,14 +6,14 @@ import java.awt.*;
 public class Board {
 
 	private boolean[][] board;
-	public HashSet<Block> blocks;
+	public ArrayList<Block> blocks;
 	private Board parent;
 	private String move;
 	
 	
 	public Board(int length, int width){
 		board = new boolean[length][width];
-		blocks = new HashSet<Block>();
+		blocks = new ArrayList<Block>();
 	}
 	
 	/* We will probably make multiple constructors, but this one will 
@@ -30,7 +30,7 @@ public class Board {
 			argIndex = 1;
 		}
 		InputSource initBoard = new InputSource(args[argIndex]);
-		blocks = new HashSet();
+		blocks = new ArrayList();
 		while (true) {
 			String input = initBoard.readLine();
 			if (input == null) {
@@ -41,9 +41,7 @@ public class Board {
 			
 			if(input.matches("[0-9]{1,} [0-9]{1,}")) {
 				short length = (short) Integer.parseInt(st.nextToken());
-				System.out.println("length: " + length);
 				short width = (short) Integer.parseInt(st.nextToken());
-				System.out.println("width: " + width);
 				board = new boolean[length][width];
 			} else if (input.matches("[0-9]{1,} [0-9]{1,} [0-9]{1,} [0-9]{1,}")){
 				this.addBlock(new Block((short)Integer.parseInt(st.nextToken()),
@@ -77,8 +75,7 @@ public class Board {
 				i <= myBlock.getBottomRight().getX(); i++) {
 			for (int a = (int) myBlock.getTopLeft().getY(); 
 					a <= myBlock.getBottomRight().getY(); a++) {
-				System.out.println("i: " + i + " a: " + a);
-				
+		
 				board[i][a] = false;
 			}
 		}
@@ -86,6 +83,7 @@ public class Board {
 		for (int i = newXTL; i <= newXBR  ; i++) {
 			
 			for (int a = newYTL; a <= newYBR; a++) {
+				//System.out.println(" adding block i: " + i + " a: " + a);
 				board[i][a] = true;
 			}
 		}
@@ -97,17 +95,19 @@ public class Board {
 	 * positive margin means move left
 	 */
 	public void moveBlockHorizontal(Block myBlock, int margin){
-		System.out.println(myBlock.getTopLeft().getY());
+		//System.out.println("margin: " + margin);
+		//System.out.println("TopLeft y: " + myBlock.getTopLeft().getY());
 		int newXTL = (int) (myBlock.getTopLeft().getX());
 		int newXBR = (int) (myBlock.getBottomRight().getX());
 		int newYTL = (int) (myBlock.getTopLeft().getY()+ margin);
 		int newYBR = (int) (myBlock.getBottomRight().getY() + margin);
+		//System.out.println("Block TopLeft: " + myBlock.getTopLeft());
+		//System.out.println("Block bottomRight: " + myBlock.getBottomRight());
 		for (int i = (int) myBlock.getTopLeft().getX();  
 				i <= myBlock.getBottomRight().getX(); i++) {
 			for (int a = (int) myBlock.getTopLeft().getY(); 
 					a <= myBlock.getBottomRight().getY(); a++) {
-				System.out.println(myBlock.getTopLeft().getY());
-				System.out.println("i: " + i + " a: " + a);
+				//System.out.println("i: " + i + " a: " + a);
 				
 				board[i][a] = false;
 			}
@@ -130,7 +130,7 @@ public class Board {
 				copy.board[i][k] = this.board[i][k];
 			}
 		}
-		copy.blocks = new HashSet(this.blocks);
+		copy.blocks = new ArrayList<Block>(this.blocks);
 		return copy;
 	}
 	
@@ -167,7 +167,7 @@ public class Board {
 			int U = 0;
 			int D = 0;
 			//see if current block can go left or right
-			for (int i = (int) s.getTopLeft().getX(); i<= (int)s.getBottomRight().getX();i++){
+			for (int i = s.getTopLeft().x; i<= s.getBottomRight().x;i++){
 				//left
 				if((int)s.getTopLeft().getY()==0)
 					L++;
@@ -245,7 +245,7 @@ public class Board {
 	 * isOK for Board
 	 * ask sergio if boolean board has to match up with board
 	 */
-	public boolean isOK() {
+	public void isOK() throws IllegalBoardException {
 		boolean[][] existing = new boolean[board.length][board[0].length];
 		for (Block current: blocks) {
 			short xcoordTL = (short) current.getTopLeft().x;
@@ -253,26 +253,39 @@ public class Board {
 			short xcoordBR = (short) current.getBottomRight().x;
 			short ycoordBR = (short) current.getBottomRight().y;
 			if (xcoordTL < 0 || ycoordTL < 0 || xcoordBR < 0 || ycoordBR < 0) {
-				return false;
+				throw new IllegalBoardException("Block:" + current + " is out of bounds");
 			}
 			if (xcoordTL > board.length || ycoordTL > board[0].length || xcoordBR > board.length || ycoordBR > board[0].length){
-				return false;
+				throw new IllegalBoardException("Block:" + current + " is out of bounds");
 			}
 			for (short i = xcoordTL; i <= xcoordBR; i++) {
 				for (short a = ycoordTL; a <= ycoordBR; a++) {
 					if (!existing[i][a]) {
 						existing[i][a] = true;
 					} else {
-						return false;
+						throw new IllegalBoardException("Block:" + current + " is overlapping another block");
 					}
 				}
 			}
 		}
-		if (!java.util.Arrays.equals(existing, board)) {
-			return false;
+		
+		for (int i = 0; i < existing.length; i++ ){
+			for (int k = 0; k < existing[0].length; k++){
+				if (board[i][k] != existing[i][k]){
+					throw new IllegalBoardException("blocks hashset does not match board boolean matrix. i: " + i + " k: " + k);
+				}
+			}
 		}
-		return true;
+		/* PRINT EXISTING
+		for (short i = 0; i < existing.length; i++) {
+				for (short k = 0; k < existing[0].length; k++) {
+					System.out.print(existing[i][k] + " ");
+				}
+				System.out.println();
+		}
+		*/
 	}
+	
 	
 	/*
 	 * Get method for parent board
@@ -314,17 +327,26 @@ public class Board {
 	public static void main (String [ ] args) throws IllegalBoardException {
 		Board test = new Board(args);
 		test.printboard();
+		
 		Block myBlock = test.getBlock(new Point(1,1), new Point(2,2));
 		System.out.println(myBlock.getTopLeft());
 		System.out.println(myBlock.getBottomRight());
-		System.out.println("before move vertical " +myBlock.getTopLeft().getY());
+		System.out.println("before move vertical " + myBlock.getTopLeft().getY());
 		test.moveBlockVertical(myBlock, -1);
 		System.out.println("after move vertical " +myBlock.getTopLeft().getY());
 		test.printboard();
+		test.isOK();
+		Board test3 = test.copyBoard();
+		System.out.println(test.equals(test3));
 		test.removeBlock(test.getBlock(new Point(0,0), new Point(1,0)));
 		System.out.println("before method " +myBlock.getTopLeft().getY());
 		test.moveBlockHorizontal(myBlock, -1);
 		test.printboard();
+		
+		Board test2 = test.copyBoard();
+		System.out.println(test.equals(test2));
+		
+
 		
 		
 	}
