@@ -10,7 +10,7 @@ public class Solver {
 		boardStack = new Stack<Board>();
 		boardStack.push(new Board(args));
 		visited.add(boardStack.firstElement());
-		getFinalConfig();
+		getFinalConfig(args);
 	}
 
 	// we need to write some sort of algorithm method
