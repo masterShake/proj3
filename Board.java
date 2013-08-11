@@ -218,7 +218,7 @@ public class Board {
 				if(s.getTopLeft().getX()==0)
 					U++;
 				try{
-				if(board[(int) (s.getTopLeft().getX()-1)][k]==true || (int)s.getTopLeft().getX()==0){
+				if(board[(int) (s.getTopLeft().getX()-1)][k]==true){
 					U++;
 				}
 				}catch(Exception e){}
@@ -226,7 +226,7 @@ public class Board {
 				if(s.getBottomRight().getX()== board.length-1)
 					D++;
 				try{
-				if(board[(int) (s.getBottomRight().getX()+1)][k]==true || (int)s.getBottomRight().getX()==board[0].length){
+				if(board[(int) (s.getBottomRight().getX()+1)][k]==true){
 					D++;
 				}
 				}catch(Exception e){}
@@ -275,6 +275,10 @@ public class Board {
 	public void isOK() throws IllegalBoardException {
 		boolean[][] existing = new boolean[board.length][board[0].length];
 		for (Block current: blocks) {
+			if (!current.isOk()){
+				throw new IllegalBoardException("Block: " + current + " is not a legal block");
+			}
+			
 			short xcoordTL = (short) current.getTopLeft().x;
 			short ycoordTL = (short) current.getTopLeft().y;
 			short xcoordBR = (short) current.getBottomRight().x;
