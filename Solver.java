@@ -1,9 +1,11 @@
+import java.awt.Point;
 import java.util.*;
 
 public class Solver {
 	private HashSet<Board> visited;
 	private Queue<Board> boardStack;
 	private ArrayList<Block> finalConfig = new ArrayList<Block>();
+	private Board lastBoard;
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
@@ -19,7 +21,20 @@ public class Solver {
 			//System.out.println("empty stack");
 			System.exit(1);
 		}
+		
 		Board current = boardStack.poll();
+		/*
+		if (current.getParent() != null){
+			if (!current.getParent().equals(lastBoard)){
+				System.out.println("Circling back. Go back to board produced by move: " 
+						+ current.getParent().getMove());
+			}
+		}
+		
+		lastBoard = current;
+		System.out.println(current.getMove());
+		*/
+		//System.out.println();
 		//current.printboard();
 		if (this.isGoal(current)) {
 			Board currentCopy = current;
@@ -33,23 +48,29 @@ public class Solver {
 			} else {
 				System.out.print(output.substring(0,output.length()-1));
 			}
+			//System.out.println("congrats");
 			return;
 		}
-		//System.out.println("looking for moves");
+		//System.out.println("looking for all possible moves");
 		ArrayList<Move> moves = current.possibleMoves();
 		for (Move m : moves) {
-			//System.out.println(m);
+			//System.out.print(m);
 			Board add = current.alterBoard(m);
 			//add.printboard();
 			
-			//add.isOK();
+			/*add.isOK();
+			 * System.out.println("Checking isOK");
+			 */
 
 			if (!visited.contains(add)) {
+				//System.out.println( "     add to stack");
 				//System.out.println(m);
 				boardStack.offer(add);
 				visited.add(add);
 				add.setParent(current);
 				add.setMove(m.toString());
+			} else {
+				//System.out.println();
 			}
 		}
 		
