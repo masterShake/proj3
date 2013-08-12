@@ -2,25 +2,25 @@ import java.util.*;
 
 public class Solver {
 	private HashSet<Board> visited;
-	private Stack<Board> boardStack;
-	private ArrayList<Block> finalConfig = new ArrayList<Block>();
+	private PriorityQueue<Board> boardStack;
+	public ArrayList<Block> finalConfig = new ArrayList<Block>();
 	private Board lastBoard;
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
-		boardStack = new Stack<Board>();
-		boardStack.push(new Board(args));
+		boardStack = new PriorityQueue<Board>();
+		boardStack.offer(new Board(args));
 		visited.add(boardStack.peek());
 		getFinalConfig(args);
 	}
-	
-	
+
+
 	// we need to write some sort of algorithm method
 	public void searchMethod() throws Exception {
-		
+
 		while (!boardStack.isEmpty()) {
 
-			Board current = boardStack.pop();
+			Board current = boardStack.poll();
 			/*if (current.getParent() != null){
 	            if (!current.getParent().equals(lastBoard)){
 	                System.out.println("Circling back. Go back to board produced by move: " 
@@ -43,22 +43,20 @@ public class Solver {
 					System.out.print(output.substring(0,output.length()-1));
 				}
 				return;
-			}
-			//System.out.println("looking for moves");
-			ArrayList<Move> moves = current.possibleMoves();
-			for (Move m : moves) {
-				//System.out.println(m);
-				Board add = current.alterBoard(m);
-				//add.printboard();
-
-				//add.isOK();
-
-				if (!visited.contains(add)) {
+			} else if (visited.add(current)){
+				ArrayList<Move> moves = current.possibleMoves();
+				for (Move m : moves) {
 					//System.out.println(m);
-					boardStack.push(add);
-					visited.add(add);
-					add.setParent(current);
-					add.setMove(m.toString());
+					Board add = current.alterBoard(m);
+					//add.printboard();
+
+					//add.isOK();
+
+						//System.out.println(m);
+						add.evaluationFunc(this);
+						boardStack.offer(add);
+						add.setParent(current);
+						add.setMove(m.toString());
 				}
 			}
 		}
@@ -67,7 +65,7 @@ public class Solver {
 			//System.out.println("empty stack");
 			System.exit(1);
 		}*/
-		
+
 
 		/* PRINT VISITED
 		System.out.println("visited");
@@ -79,55 +77,7 @@ public class Solver {
 		//searchMethod();
 
 	}
-	
-	public void searchMethod() throws Exception{
-		if (boardStack.isEmpty()) {
-			//System.out.println("empty stack");
-			System.exit(1);
-		}
-		Board current = boardStack.pop();
-		/*if (current.getParent() != null){
-            if (!current.getParent().equals(lastBoard)){
-                System.out.println("Circling back. Go back to board produced by move: " 
-                        + current.getParent().getMove());
-            }
-        }
-        lastBoard = current;*/
-        //System.out.println(current.getMove());
-		//current.printboard();
-		if (this.isGoal(current)) {
-			Board currentCopy = current;
-			String output = "";
-			while (currentCopy.getParent() != null) {
-				output = currentCopy.getMove() + "\n" + output;
-				currentCopy = currentCopy.getParent();
-			}
-			if (output.length() == 0){
-				System.out.print(output);
-			} else {
-				System.out.print(output.substring(0,output.length()-1));
-			}
-			return;
-		}
-		//System.out.println("looking for moves");
-		ArrayList<Move> moves = current.possibleMoves();
-		for (Move m : moves) {
-			//System.out.println(m);
-			Board add = current.alterBoard(m);
-			//add.printboard();
 
-			//add.isOK();
-
-			if (!visited.contains(add)) {
-				//System.out.println(m);
-				boardStack.push(add);
-				visited.add(add);
-				add.setParent(current);
-				add.setMove(m.toString());
-			}
-		}
-		
-	}
 
 	// populates the List with blocks from the final configuration file.
 	public void getFinalConfig(String[] args) throws IllegalBoardException {
