@@ -3,19 +3,21 @@ import java.util.*;
 import java.awt.*;
 
 
-public class Board {
+public class Board implements Comparable<Board> {
 
 	private boolean[][] board;
 	public HashSet<Block> blocks;
 	private Board parent;
 	private String move;
-	
-	
+	private int distance;
+	private int rank;
+
+
 	public Board(int length, int width){
 		board = new boolean[length][width];
 		blocks = new HashSet<Block>();
 	}
-	
+
 	/* We will probably make multiple constructors, but this one will 
 	 * create a board by taking in an input file.
 	 */
@@ -31,14 +33,15 @@ public class Board {
 		}
 		InputSource initBoard = new InputSource(args[argIndex]);
 		blocks = new HashSet();
+		rank = -1;
 		while (true) {
 			String input = initBoard.readLine();
 			if (input == null) {
                 return;
             }
-	
+
 			StringTokenizer st = new StringTokenizer(input);
-			
+
 			if(input.matches("[0-9]{1,} [0-9]{1,}")) {
 				short length = (short) Integer.parseInt(st.nextToken());
 				short width = (short) Integer.parseInt(st.nextToken());
@@ -52,20 +55,51 @@ public class Board {
         }
 	}
 	
+	public void evaluationFunc (Solver goal) {
+		int rank = 0;
+		for (Block a: blocks) {
+			int height = a.getHeight();
+			int width = a.getWidth();
+			for (Block b: goal.finalConfig) {
+				if (height == b.getHeight() && width == b.getWidth()) {
+					rank += distance(a, b);
+				}
+			}
+		}
+		this.rank = rank;
+	}
+	public int distance(Block blockA, Block blockB) {
+		int first = (int) Math.abs(Math.pow(blockA.getTopLeft().x - blockB.getTopLeft().x, 2));
+		int next = (int) Math.abs(Math.pow(blockA.getTopLeft().y - blockB.getTopLeft().y, 2));
+		distance = (int) Math.sqrt(first + next);
+		return distance;
+	}
+	
+	public int compareTo(Board goalBoard) {
+		//System.out.println("compareTo is geting called...");
+		if (this.rank == goalBoard.rank) {
+			return 0;
+		} else if (this.rank < goalBoard.rank){
+			return -10000;
+		} else {
+			return 1;
+		}
+	}
+
 	public void addBlock(Block myBlock) {
 		short xcoordTL = (short) myBlock.getTopLeft().getX();
 		short ycoordTL = (short) myBlock.getTopLeft().getY();
 		short xcoordBR = (short) myBlock.getBottomRight().getX();
 		short ycoordBR = (short) myBlock.getBottomRight().getY();
 		for (short i = xcoordTL; i <= xcoordBR; i++) {
-			
+
 			for (short a = ycoordTL; a <= ycoordBR; a++) {
 				board[i][a] = true;
 			}
 		}
 		blocks.add(myBlock);
 	}
-	
+
 	/*
 	 * UPDATE: This method only alters the boolean array.  
 	 * Blocks are now immutable, so boards are immutable as well basically. 
@@ -79,13 +113,13 @@ public class Board {
 				i <= myBlock.getBottomRight().getX(); i++) {
 			for (int a = (int) myBlock.getTopLeft().getY(); 
 					a <= myBlock.getBottomRight().getY(); a++) {
-		
+
 				board[i][a] = false;
 			}
 		}
-		
+
 		for (int i = newXTL; i <= newXBR  ; i++) {
-			
+
 			for (int a = newYTL; a <= newYBR; a++) {
 				//System.out.println(" adding block i: " + i + " a: " + a);
 				board[i][a] = true;
@@ -113,13 +147,13 @@ public class Board {
 			for (int a = (int) myBlock.getTopLeft().getY(); 
 					a <= myBlock.getBottomRight().getY(); a++) {
 				//System.out.println("i: " + i + " a: " + a);
-				
+
 				board[i][a] = false;
 			}
 		}
-		
+
 		for (int i = newXTL; i <= newXBR  ; i++) {
-			
+
 			for (int a = newYTL; a <= newYBR; a++) {
 				board[i][a] = true;
 			}
@@ -157,10 +191,10 @@ public class Board {
 				copy.blocks.add(b.copyBlock());
 			}
 		}
-		
+
 		return copy;
 	}
-	
+
 	public Block getBlock(Point topLeft, Point bottomRight){
 		Block myBlock = new Block(0,0,0,0);
 		for (Block b: this.blocks){
@@ -171,7 +205,7 @@ public class Board {
 		}
 		return myBlock;
 	}
-	
+
 	public void removeBlock(Block myBlock){
 		this.blocks.remove(myBlock);
 		for (int i = (int) myBlock.getTopLeft().getX(); i<= myBlock.getBottomRight().getX(); i++){
@@ -185,10 +219,10 @@ public class Board {
     	
     		//initialize the ArrayList of Moves
 	    	ArrayList<Move> m = new ArrayList<Move>();
-		
+
 		//match blocks to empty spaces
 		for (Block s : blocks) {
-			
+
 			int R = 0;
 			int L = 0;
 			int U = 0;
@@ -241,7 +275,7 @@ public class Board {
 				m.add(new Move(s, "down"));	
 		}
 		return m;
-		
+
 	}
 
 
@@ -261,13 +295,13 @@ public class Board {
 		if (other == null) return false;
 		if (other == this) return true;
 		if (!(other instanceof Board))return false;
-		
-		
+
+
 		Board otherBoard = (Board) other;
 		return this.blocks.equals(otherBoard.blocks);
-	
+
 	}
-	
+
 	/*
 	 * isOK for Board
 	 * ask sergio if boolean board has to match up with board
@@ -275,10 +309,6 @@ public class Board {
 	public void isOK() throws IllegalBoardException {
 		boolean[][] existing = new boolean[board.length][board[0].length];
 		for (Block current: blocks) {
-			if (!current.isOk()){
-				throw new IllegalBoardException("Block: " + current + " is not a legal block");
-			}
-			
 			short xcoordTL = (short) current.getTopLeft().x;
 			short ycoordTL = (short) current.getTopLeft().y;
 			short xcoordBR = (short) current.getBottomRight().x;
@@ -299,7 +329,7 @@ public class Board {
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < existing.length; i++ ){
 			for (int k = 0; k < existing[0].length; k++){
 				if (board[i][k] != existing[i][k]){
@@ -316,37 +346,37 @@ public class Board {
 		}
 		*/
 	}
-	
-	
+
+
 	/*
 	 * Get method for parent board
 	 */
 	public Board getParent() {
 		return parent;
 	}
-	
+
 	public void setParent(Board parent) {
 		this.parent = parent;
 	}
-	
+
 	/*
 	 * Get method for the previous move that gets you to current board
 	 */
 	public String getMove() {
 		return move;
 	}
-	
+
 	public void setMove(String move) {
 		this.move = move;
 	}
-	
+
 	/*
 	 * Still needs to be implemented
 	 */
 	public String toString(){
 		return "";
 	}
-	
+
 	public void printboard() {
 		for (short i = 0; i < board.length; i++) {
 			for (short k = 0; k < board[0].length; k++) {
@@ -358,7 +388,7 @@ public class Board {
 	public static void main (String [ ] args) throws IllegalBoardException {
 		Board test = new Board(args);
 		test.printboard();
-		
+
 		Block myBlock = test.getBlock(new Point(1,1), new Point(2,2));
 		System.out.println(myBlock.getTopLeft());
 		System.out.println(myBlock.getBottomRight());
@@ -371,10 +401,9 @@ public class Board {
 		System.out.println("before method " +myBlock.getTopLeft().getY());
 		test.moveBlockHorizontal(myBlock, -1);
 		test.printboard();
-		
 
-		
-		
+
+
+
 	}
 }
-
