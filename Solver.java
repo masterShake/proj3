@@ -1,40 +1,99 @@
-import java.awt.Point;
 import java.util.*;
 
 public class Solver {
 	private HashSet<Board> visited;
-	private Queue<Board> boardStack;
+	private Stack<Board> boardStack;
 	private ArrayList<Block> finalConfig = new ArrayList<Block>();
 	private Board lastBoard;
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
-		boardStack = new LinkedList<Board>();
-		boardStack.offer(new Board(args));
+		boardStack = new Stack<Board>();
+		boardStack.push(new Board(args));
 		visited.add(boardStack.peek());
 		getFinalConfig(args);
 	}
-
+	
+	
 	// we need to write some sort of algorithm method
 	public void searchMethod() throws Exception {
+		
+		while (!boardStack.isEmpty()) {
+
+			Board current = boardStack.pop();
+			/*if (current.getParent() != null){
+	            if (!current.getParent().equals(lastBoard)){
+	                System.out.println("Circling back. Go back to board produced by move: " 
+	                        + current.getParent().getMove());
+	            }
+	        }
+	        lastBoard = current;*/
+	        //System.out.println(current.getMove());
+			//current.printboard();
+			if (this.isGoal(current)) {
+				Board currentCopy = current;
+				String output = "";
+				while (currentCopy.getParent() != null) {
+					output = currentCopy.getMove() + "\n" + output;
+					currentCopy = currentCopy.getParent();
+				}
+				if (output.length() == 0){
+					System.out.print(output);
+				} else {
+					System.out.print(output.substring(0,output.length()-1));
+				}
+				return;
+			}
+			//System.out.println("looking for moves");
+			ArrayList<Move> moves = current.possibleMoves();
+			for (Move m : moves) {
+				//System.out.println(m);
+				Board add = current.alterBoard(m);
+				//add.printboard();
+
+				//add.isOK();
+
+				if (!visited.contains(add)) {
+					//System.out.println(m);
+					boardStack.push(add);
+					visited.add(add);
+					add.setParent(current);
+					add.setMove(m.toString());
+				}
+			}
+		}
+		System.exit(1);
+		/*if (boardStack.isEmpty()) {
+			//System.out.println("empty stack");
+			System.exit(1);
+		}*/
+		
+
+		/* PRINT VISITED
+		System.out.println("visited");
+		for (Board b: visited){
+			System.out.println();
+			b.printboard();
+		}
+		*/
+		//searchMethod();
+
+	}
+	
+	public void searchMethod() throws Exception{
 		if (boardStack.isEmpty()) {
 			//System.out.println("empty stack");
 			System.exit(1);
 		}
-		
-		Board current = boardStack.poll();
-		/*
-		if (current.getParent() != null){
-			if (!current.getParent().equals(lastBoard)){
-				System.out.println("Circling back. Go back to board produced by move: " 
-						+ current.getParent().getMove());
-			}
-		}
-		
-		lastBoard = current;
-		System.out.println(current.getMove());
-		*/
-		//System.out.println();
+		Board current = boardStack.pop();
+		/*if (current.getParent() != null){
+            if (!current.getParent().equals(lastBoard)){
+                System.out.println("Circling back. Go back to board produced by move: " 
+                        + current.getParent().getMove());
+            }
+        }
+        lastBoard = current;*/
+        //System.out.println(current.getMove());
 		//current.printboard();
 		if (this.isGoal(current)) {
 			Board currentCopy = current;
@@ -48,41 +107,26 @@ public class Solver {
 			} else {
 				System.out.print(output.substring(0,output.length()-1));
 			}
-			//System.out.println("congrats");
 			return;
 		}
-		//System.out.println("looking for all possible moves");
+		//System.out.println("looking for moves");
 		ArrayList<Move> moves = current.possibleMoves();
 		for (Move m : moves) {
-			//System.out.print(m);
+			//System.out.println(m);
 			Board add = current.alterBoard(m);
 			//add.printboard();
-			
-			/*add.isOK();
-			 * System.out.println("Checking isOK");
-			 */
+
+			//add.isOK();
 
 			if (!visited.contains(add)) {
-				//System.out.println( "     add to stack");
 				//System.out.println(m);
-				boardStack.offer(add);
+				boardStack.push(add);
 				visited.add(add);
 				add.setParent(current);
 				add.setMove(m.toString());
-			} else {
-				//System.out.println();
 			}
 		}
 		
-		/* PRINT VISITED
-		System.out.println("visited");
-		for (Board b: visited){
-			System.out.println();
-			b.printboard();
-		}
-		*/
-		searchMethod();
-
 	}
 
 	// populates the List with blocks from the final configuration file.
