@@ -1,5 +1,11 @@
 import java.awt.Point;
 
+
+/*
+ * The Block class represents a single block on the board. We used java's Point class
+ * to represent x and y coordinates. The position of a specific block is immutable once
+ * it is placed on the board.
+ */
 public class Block {
 
 	private Point topLeft;
@@ -31,23 +37,18 @@ public class Block {
 		return topLeft.y - bottomRight.y;
 	}
 
-		/*
-	 * Could be improved
-	 * 
+	/*
+	 * Our hashCode is a sum of all the coordinates of the top left and bottom
+	 * right of a block. We chose an arbitrary number to multiply the sum by to 
+	 * minimize collisions.
 	 */
 	public int hashCode(){
-		return getTopLeft().x + getTopLeft().y + getBottomRight().x + getBottomRight().y;
-	}
-
-
-	//to be implemented later if needed
-	public Point getTopRight(){
-		return new Point();
-	}
-
-	//to be implemented later if needed
-	public Point getBottomLeft(){
-		return new Point();
+		int sum = 1;
+		sum = 31*sum + getTopLeft().x;
+		sum = 31*sum + getTopLeft().y;
+		sum = 31*sum + getBottomRight().x;
+		sum = 31*sum + getBottomRight().y;
+		return sum;
 	}
 
 	public String toString(){
@@ -64,9 +65,12 @@ public class Block {
 				&& this.bottomRight.equals(otherBlock.bottomRight);
 	}
 
-	//isOK this probably isn't enough code but I'm not really sure what else could be added
-	public boolean isOk(Block B){
-		if(B.getBottomRight().x<B.getTopLeft().x || B.getBottomRight().y<B.getTopLeft().y)
+	/*
+	 * This isOk method checks of the coordinates are well-formed by checking if the positions
+	 * are appropriately greater or less than each other.
+	 */
+	public boolean isOk(){
+		if(getBottomRight().x<getTopLeft().x || getBottomRight().y< getTopLeft().y)
 			return false;
 		return true;
 	}
