@@ -5,31 +5,46 @@ public class Solver {
 	private PriorityQueue<Board> boardStack;
 	public ArrayList<Block> finalConfig = new ArrayList<Block>();
 	private Board lastBoard;
+	private boolean debuggingSolver1, debuggingSolver2, debuggingBoard;
 
 	public Solver(String[] args) throws IllegalBoardException {
 		visited = new HashSet<Board>();
 		boardStack = new PriorityQueue<Board>();
 		boardStack.offer(new Board(args));
-		visited.add(boardStack.peek());
 		getFinalConfig(args);
+		if (args[0].equals("-odebuggingSolver1")) {
+			debuggingSolver1 = true;
+		} else if (args[0].equals("-odebuggingSolver2")) {
+			debuggingSolver2 = true;
+		} else if (args[0].equals("-odebuggingBoard")) {
+			debuggingBoard = true;
+		} else if (args[0].equals("-ooptions")) {
+			System.out.println("-odebuggingSolver1: prints all moves that have been tried so far");
+			System.out.println("-odebuggingSolver2: prints all moves that are added to the priority queue and prints current board");
+			System.out.println("-odebuggingBoard: calls isOk methods on board and block and prints current board and boards added");
+		} else if (args.length == 3){
+			System.out.println("Not a correct debugging option.");
+			System.exit(1);
+		}
 	}
 
 
-	// we need to write some sort of algorithm method
+	/*
+	 * Greedy search algorithm implemented with a priority queue used to find solution.
+	 */
 	public void searchMethod() throws Exception {
 
 		while (!boardStack.isEmpty()) {
 
 			Board current = boardStack.poll();
-			/*if (current.getParent() != null){
-	            if (!current.getParent().equals(lastBoard)){
-	                System.out.println("Circling back. Go back to board produced by move: " 
-	                        + current.getParent().getMove());
-	            }
-	        }
-	        lastBoard = current;*/
-	        //System.out.println(current.getMove());
-			//current.printboard();
+			if (debuggingSolver1) {
+				System.out.println("move: " + current.getMove() + " is popped");
+			}
+			if (debuggingBoard) {
+				System.out.println("current board is: ");
+				current.printboard();
+				System.out.println();
+			}
 			if (this.isGoal(current)) {
 				Board currentCopy = current;
 				String output = "";
@@ -43,39 +58,31 @@ public class Solver {
 					System.out.print(output.substring(0,output.length()-1));
 				}
 				return;
-			} else if (visited.add(current)){
+			}else if (visited.add(current)){
 				ArrayList<Move> moves = current.possibleMoves();
+				if (debuggingSolver2) {
+					System.out.println("Looking for moves for current board: ");
+					current.printboard();
+				}
 				for (Move m : moves) {
-					//System.out.println(m);
 					Board add = current.alterBoard(m);
-					//add.printboard();
-
-					//add.isOK();
-
-						//System.out.println(m);
-						add.evaluationFunc(this);
-						boardStack.offer(add);
-						add.setParent(current);
-						add.setMove(m.toString());
+					if (debuggingSolver2) {
+						System.out.println("move added: " + m);
+					}
+					if (debuggingBoard) {
+						add.isOK();
+						System.out.println("board added is ");
+						add.printboard();
+						System.out.println();
+					}
+					add.evaluationFunc(this);
+					boardStack.offer(add);
+					add.setParent(current);
+					add.setMove(m.toString());
 				}
 			}
 		}
 		System.exit(1);
-		/*if (boardStack.isEmpty()) {
-			//System.out.println("empty stack");
-			System.exit(1);
-		}*/
-
-
-		/* PRINT VISITED
-		System.out.println("visited");
-		for (Board b: visited){
-			System.out.println();
-			b.printboard();
-		}
-		*/
-		//searchMethod();
-
 	}
 
 
@@ -91,7 +98,6 @@ public class Solver {
 			argIndex = 2;
 		}
 		InputSource initBoard = new InputSource(args[argIndex]);
-		// blocks = new HashSet();
 		while (true) {
 			String input = initBoard.readLine();
 			if (input == null) {
