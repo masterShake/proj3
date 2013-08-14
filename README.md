@@ -1,7 +1,18 @@
 Project 3 version 1.0 8/9/2013
 
-GENERAL USAGE NOTES
--------------------
+			  GENERAL USAGE NOTES
+
+
+Division of labor
+------------------
+
+- Our group collectively spent roughly 50 hours developing this program.
+  Each group member spent about the same amount of time as the other 
+  group members. Many, if not most of the classes and methods developed
+  were the result of a collaborative effort
+
+Design
+------------------
 
 - Our sliding block puzzle solver employs a variety of datastructures to
   quickly and effectively meet the needs of the project constraints.
@@ -31,6 +42,13 @@ GENERAL USAGE NOTES
   points. The next several paragraphs go into detail about these data
   structures and how their implimentation contributes to the overall
   functionality of the program.
+
+  NOTE: There are several methods in the Board class used to 
+  heuristically evaluate the each of the possible moves. These include:
+  evaluationFunc(), distance(), and compareTo(). Their implimentation
+  and methodolgy are essential to the functionality of the search
+  algorithm in the Solver class and are discussed later in this 
+  document.
 
 - In order to easily and quickly access the current possitions of each
   of the blocks, we chose to employ a HashSet called "blocks" to hold 
@@ -111,6 +129,150 @@ GENERAL USAGE NOTES
   to the finalConfig ArrayList, which sits idly for the remainder of 
   program, helping the isGoal() method to query the HashSet for 
   matching goal configuration blocks.
+
+- To solve sliding block puzzles, the program uses a heuristic greedy
+  search algorithm called searchMethod() to evaluate the relevance of
+  possible moves and act accordingly. The first operation that the 
+  algorithm performs is a while loop that polls the priority queue for 
+  unattempted possible moves. Within the loop, the algorithm first
+  determines with our program has stumbled upon the goal configuration.
+  If that is not the case, the algorithm adds the current board to the 
+  visited HashSet, then proceeds to evaluate the relevance of the next
+  possible moves.
+
+- The heuristic evaluation of possible moves is conducted by 3 methods
+  in the Board class; evaluationFunc(), distance(), and an overwrite of
+  java's built in compareTo method for evaluating the possible states in
+  our priority queue. These methods work in tandem to assign a numeric
+  value to a game board's state based on how much closer a single move
+  will bring the computer to solving the puzzle. The evaluationFunc
+  method accepts a Solver object as an argument and evaluates the
+  dimensions of each block in the current board, and compares the to 
+  blocks in the final configurations. The method then updates the 
+  object's "rank" variable with sum of the distances of blocks with 
+  matching dimensions to the final configuration goal state. This means
+  that every Board object in the priority queue is assigned a rank 
+  variable that the program can rapidly poll, thus increasing the 
+  algorithm's efficiency. In order to accurately assess the distance of 
+  a block to its position in the final configuration, the 
+  evaluationFunc() method calls on the distance() method. The distance()
+  method essentially performs the pythagorean theorem given two 
+  coordinates. The compareTo() method then simply compares the rank of
+  the current game state with the final configuration and assignes a 
+  possitive integer value to any possible move that brings the algorithm
+  "closer" to solving the puzzle.
+
+Evaluating tradeoffs
+--------------------
+
+- This entire project was an exercise in the tradeoffs when dealing with
+  different data structures. Given the time and memory constraints on 
+  solving a puzzle, the team was required to constantly consider the run
+  time and memory demands of every data structure when choosing the best
+  way to implement our program. In this section of the document, we 
+  discuss, in greate detail, the group's reasoning for the various data
+  structures in place and the cost and benefits that they afforded the 
+  program.
+
+- The first class that was developed for the project was the Block
+  class, which required the team to make critical decisions about the
+  many types of variables that would constitute a Block object. In order
+  to represent the coordinates of a block on our 2 dimensional plain, 
+  the team chose to use java's built in Point class, each Block object
+  is composed of two Points representing the position of the top left
+  corner of the Block and the bottom right corner. Only two Points were
+  necessary to extrapolate a complete picture of the dimensions of the
+  block. Using the Point class came with some tradeoffs. Firstly, 
+  retrieving point data required two getter methods called getTopLeft()
+  and getBottomRight(). It is somewhat inefficient to need to call a 
+  method every time we need information from one of our Block objects,
+  however, the team decided that this was preferable to other options,
+  such as a integers, because it allowed us to easily group together 
+  two coordinates, and it also afforded what we considered to be the 
+  fewest number of variables attatched to a Block object, a dicision 
+  that also simplified the code and development process.
+
+- In determining which data structures were necessary to represent the 
+  Board objects, the team was forced to consider all the possible and 
+  poperties that the Board may required, and the memory and speed
+  constraints that accompanied those structures. In doing so, the Board
+  object ended up being slightly more bloated than the team had hoped,
+  but still managed to achieve the program's objectives. When developing
+  these structures, the team was heavy focused on keeping lookup time as
+  low as possible.
+
+- For storing the blocks of a Board object, the team decided that a 
+  HashSet was the most appropriate choice. The HashSet afforded the 
+  program constant lookup time, thus improving performance. Very few
+  other data structures, such as an ArrayList, would have allowed for 
+  such quick performance.
+
+- Although the HashSet of Block objects could be queried in constant
+  time, determining which moves were possible in a given configuration
+  would have still required several loops through the HashSet and other 
+  calculations to find those possible moves. That is why the team 
+  decided that it would be to the programs great benefit to have a 2D 
+  Array of boolean values representing occupied and unoccupied 
+  coordinates on the game board. This allowed us to more quickly 
+  determine the possible moves and act on them. The 2D array was more
+  idea than, say, an ArrayList of empty squares because the indecies of
+  the 2D Array perfectly matched the x & y coordinates of the blocks!
+  This allowed us to query the Array using the values of a given Block 
+  object in constant time, where as an ArrayList of empty squares would
+  have had a lookup time of O(N).
+
+- In order to trace our moves back to the starting possition so as to 
+  return the steps required to solve the puzzle, every Board object 
+  pointed to a parent Board. The team realized that keeping track of the
+  steps necessary to reach a goal configuration could have been 
+  accomplished in a variety of ways, such as maintaining a stack or 
+  queue of previous moves. However, these methods would have have 
+  required additional data structures and would have likely slowed to 
+  performance of the program. A simple pointer to an related object is
+  the most efficient way to determining the moves made because it 
+  required only one loop executed only one time at once the puzzle was
+  solved. Using additional data structures would have required constant
+  updates after every additional move.
+
+- The Solver class contains several unique and lightweight data
+  structures that help to facilitate the program's high performance.
+
+- A given puzzle might have hundreds of thousands of possible game 
+  states. This presents a unique problem for the program in that these
+  states need to be stored and accessed in the least amount of time
+  possible. To keep tabs on the states that the program has already 
+  encountered, a HashSet is an obvious choice. Therefore, the program
+  implements a HashSet named "visited" in the Solver class to do just
+  that. Implementing any data structure that would require linear time
+  to look up visited game states would result in an overwhelming number
+  of calculations. There is essentially no better data structure than a
+  HashSet for keeping track of these items.
+
+- Because the group determined that a bredth-first greedy search 
+  algorithm offered a relatively simple implementation as well as high
+  performance, it was necessary to implement of queue of unvisited game
+  states. However, Bredth-first greedy was not sufficient enough to
+  accomplish the tasks required within the time limit. Therefore it was
+  deemed necessary to implement a heuristic comparison of possible moves
+  and the data structure would need to be able to access this heuristic
+  value. That is why the group decided that a PriorityQueue was superior
+  to a regular queue. This allows the program to compare the value of 
+  all possible moves in the queue and select the best one to act upon.
+
+- Finally, a simple ArrayList was all that was required to keep track of
+  the position of the blocks in the goal configuration since this 
+  usually contains many fewer Block objects than the initial
+  configuration. The group realized that another HashSet might have 
+  offered slightly improved performance, but would have come with the
+  overhead of the hashcode.
+
+
+Disclaimer
+--------------------
+
+Program Development
+--------------------
+
 
 ------------------------------------------------------------------------
 
